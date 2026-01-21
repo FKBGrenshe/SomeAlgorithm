@@ -136,6 +136,8 @@ public class BTree {
 
     public BTree() {
         this.t=2;
+        MIN_KEY_NUMBER = t-1;
+        MAX_KEY_NUMBER = 2*t-1;
     }
 
     public BTree(int t) {
@@ -183,12 +185,12 @@ public class BTree {
     }
 
     public void remove(int key){
-        doRemove(root, key);
+        doRemove(null,root,0,key);
         //todo
 
     }
 
-    public void doRemove(bTreeNode curNode, int key){
+    public void doRemove(bTreeNode parent, bTreeNode curNode, int index , int key){
         int i = 0;
         while (i != curNode.keyNumber){
             if (curNode.keys[i] >= key){
@@ -198,20 +200,96 @@ public class BTree {
         }
         if (curNode.leaf){
             if (notfound(curNode, key, i)){
-                // case1
+                // case1：当前节点是叶子节点，没找到
+                return;
             }else {
-                // case2
+                // case2：当前节点是叶子节点，找到了
+                 curNode.removeKey(i);
             }
         }else {
             if (notfound(curNode, key, i)){
-                //case3
+                //case3：当前节点是非叶子节点，没找到 -> 到当前节点的child中继续查找
+                doRemove(curNode,curNode.childs[i],i,key);
             }else {
-                //case4
+                //case4：当前节点是非叶子节点，找到了 -> 找到后继节点，进行替换，然后再删除后继key
+                bTreeNode s = curNode.childs[i + 1];
+                while (!s.leaf){
+                    s = s.childs[0];
+                }
+                // s 是后继节点 -sKey是后继key
+                int sKey = s.keys[0];
+                // 用后继key替换待删除key
+                curNode.keys[i] = sKey;
+                // 删除后继key
+                doRemove(curNode,curNode.childs[i+1], i+1, sKey);
             }
         }
         if (curNode.keyNumber < MIN_KEY_NUMBER){
             // case5 & 6
+            balance(curNode, index, parent);
+
         }
+    }
+
+    private void balance(bTreeNode curNode, int index, bTreeNode parent){
+        // case 6 root 节点
+        if (curNode == this.root){
+            // 根节点可以小于最小度数
+            // 当合并后，根节点有可能为空，其keyNumber=0，将左子节点当作新的根节点
+            if (root.keyNumber == 0 && Objects.nonNull(root.childs[0])){
+                root = root.childs[0];
+            }
+            return;
+        }
+        bTreeNode leftSibiling = parent.leftSibiling(index);
+        bTreeNode rightSibiling = parent.rightSibiling(index);
+        // case 5.1 -- 左边富裕 - 右旋
+        if (Objects.nonNull(leftSibiling) && leftSibiling.keyNumber > MIN_KEY_NUMBER) {
+            // 将父节点中index-1的key（前驱key）旋转下来
+            curNode.insertKey(parent.keys[index-1],0);
+            // 如果左边兄弟有孩子，将最右边的孩子移动给当前节点的最左边
+            if (!leftSibiling.leaf) {
+                curNode.insertChild(leftSibiling.removeRightmostChild(),0);
+            }
+            // 左边兄弟富裕的key旋转到父节点中
+            parent.keys[index-1] = leftSibiling.removeRightmostKey();
+            return;
+        }
+        // case 5.2 -- 右边富裕 - 左旋
+        if (Objects.nonNull(rightSibiling) && rightSibiling.keyNumber > MIN_KEY_NUMBER) {
+            // 将父节点中index的key（后继key）左旋转下来
+            curNode.insertKey(parent.keys[index], curNode.keyNumber);
+            // 如果右边兄弟有孩子，将最左边的孩子移动给当前节点的最右边
+            if (!rightSibiling.leaf){
+                curNode.insertChild(rightSibiling.removeLeftmostChild(), curNode.keyNumber+1);
+            }
+            // 右边兄弟富裕的key左旋转到父节点最右边
+            parent.keys[index] = rightSibiling.removeLeftmostKey();
+            return;
+        }
+        // case 5.3 -- 左右都不富裕 - 合并
+        if (Objects.nonNull(leftSibiling)){
+            // 向左兄弟合并
+            /* 需要合并的节点：当前节点， 父节点中的一个key，左兄弟
+            *  合并目的地： 左兄弟
+            *  合并流程：父节点中的一个key 是指 当前节点索引前的key，即父节点中索引inde-1的key
+            *    1. 先将父节点中的一个key合并到左兄弟上
+            *    2. 再将当前节点合并到左兄弟上
+            * */
+            // 将当前节点从父节点中删除
+            parent.removeChild(index);
+            leftSibiling.insertKey(parent.removeKey(index-1), leftSibiling.keyNumber);
+            curNode.moveToTarget(leftSibiling); // 将当前节点的所有孩子和key移动到左兄弟(追加到末尾)
+        }else {
+            // 左兄弟为空，向自己合并
+            /* 将自己当作左兄弟，右兄弟当作“当前节点”，所有index+1
+            * */
+            parent.removeChild(index+1);
+            curNode.insertKey(parent.removeKey(index), curNode.keyNumber);
+            rightSibiling.moveToTarget(curNode);
+        }
+
+
 
     }
 
