@@ -62,11 +62,69 @@ public class BTree {
             keyNumber++;
         }
 
-
         // 向childs指定索引处插入新child
         void insertChild(bTreeNode child,int index){
             System.arraycopy(childs,index,childs,index+1,keyNumber-index);
             childs[index]=child;
+        }
+
+        int removeKey(int index){
+            int t = keys[index];
+            System.arraycopy(keys, index+1, keys, index, --keyNumber-index);
+            return t;
+        }
+
+        int removeLeftmostKey(){
+            return removeKey(0);
+        }
+
+        int removeRightmostKey(){
+            return removeKey(keyNumber - 1);
+        }
+
+        bTreeNode removeChild(int index){
+            bTreeNode child = childs[index];
+            System.arraycopy(childs, index+1, childs, index, keyNumber - index);
+            childs[keyNumber] = null;
+            return child;
+        }
+
+        bTreeNode removeLeftmostChild(){
+            return removeChild(0);
+        }
+        bTreeNode removeRightmostChild(){
+            return removeChild(keyNumber);
+        }
+
+        // index 孩子处左边的兄弟
+        bTreeNode childLeftSibling(int index){
+            return index > 0 ? childs[index - 1] : null;
+        }
+
+        bTreeNode childRightSibling(int index){
+            return index == keyNumber ? null : childs[index + 1];
+        }
+
+        // 复制当前节点的所有key和child到target中
+        void moveToTarget(bTreeNode target){
+            int start = target.keyNumber;
+            if (!leaf) {
+                // 如果不是叶子节点 - 当前节点有孩子 - 将当前节点的孩子追加到目标节点
+                for (int i = 0; i <= keyNumber; i++){
+                    target.childs[start+i] = childs[i];
+                }
+            }
+            // 将key也追加在当前节点上
+            for (int i = 0; i < keyNumber;  i++){
+                target.keys[target.keyNumber++] = keys[i];
+            }
+        }
+
+        bTreeNode leftSibiling(int index){
+            return index > 0 ? childs[index-1] : null;
+        }
+        bTreeNode rightSibiling(int index){
+            return  index == keyNumber ? null : childs[index + 1];
         }
 
     }
