@@ -39,6 +39,7 @@ public class Solution_51_Hot100 {
         if (curRow == n){
             // 到达最底层，成功
             globalResult.add(new ArrayList<>(curResult));
+            return;
         }
 
         // 对当前第curRow行进行列遍历，看看哪一列可以放
@@ -47,11 +48,11 @@ public class Solution_51_Hot100 {
             if (!canAttack()){
                 // 构造当前string
                 StringBuilder sb = new StringBuilder();
-                for (int i = 0; i < curColumn-1; i++) {
+                for (int i = 0; i < curColumn; i++) {
                     sb.append('.');
                 }
                 sb.append('Q');
-                for (int i = n; i > curColumn; i--) {
+                for (int i = curColumn+1; i < n; i++) {
                     sb.append('.');
                 }
                 String curString = sb.toString();
@@ -77,9 +78,11 @@ public class Solution_51_Hot100 {
 
         if (purOrRemove){
             // put queen on the board
+            queenBoard[curRow][curColumn] = true;
             changeAttackBoard(curRow, curColumn, 1);
         }else {
             // remove queen from the board
+            queenBoard[curRow][curColumn] = false;
             changeAttackBoard(curRow,curColumn,-1);
         }
 
@@ -92,17 +95,23 @@ public class Solution_51_Hot100 {
      * @param changedValue
      */
     private void changeAttackBoard(int queenRowIdx, int queenColumnIdx, int changedValue) {
+
+        // 自己位置
+        // attackBoard[queenRowIdx][queenColumnIdx] += changedValue;
+
         // 同一行
         for (int column = 0; column < n; column++) {
+            if (column == queenColumnIdx) continue;
             attackBoard[queenRowIdx][column] += changedValue;
         }
         // 同一列
         for (int row = 0; row < n; row++) {
+            if (row == queenRowIdx) continue;
             attackBoard[row][queenColumnIdx] += changedValue;
         }
         // 斜线
-        int curRowIdx = queenRowIdx;
-        int curColumnIdx = queenColumnIdx;
+        int curRowIdx = queenRowIdx-1;
+        int curColumnIdx = queenColumnIdx-1;
         // 左上 -- -1， -1
         while (legalIdx(curRowIdx, curColumnIdx)){
             attackBoard[curRowIdx][curColumnIdx] += changedValue;
@@ -110,22 +119,22 @@ public class Solution_51_Hot100 {
         }
 
         // 右上 -- -1， +1
-        curRowIdx = queenRowIdx;
-        curColumnIdx = queenColumnIdx;
+        curRowIdx = queenRowIdx-1;
+        curColumnIdx = queenColumnIdx+1;
         while (legalIdx(curRowIdx, curColumnIdx)){
             attackBoard[curRowIdx][curColumnIdx] += changedValue;
             curRowIdx--; curColumnIdx++;
         }
         // 左下 -- +1， -1
-        curRowIdx = queenRowIdx;
-        curColumnIdx = queenColumnIdx;
+        curRowIdx = queenRowIdx+1;
+        curColumnIdx = queenColumnIdx-1;
         while (legalIdx(curRowIdx, curColumnIdx)){
             attackBoard[curRowIdx][curColumnIdx] += changedValue;
             curRowIdx++; curColumnIdx--;
         }
         // 右下 -- +1， +1
-        curRowIdx = queenRowIdx;
-        curColumnIdx = queenColumnIdx;
+        curRowIdx = queenRowIdx+1;
+        curColumnIdx = queenColumnIdx+1;
         while (legalIdx(curRowIdx, curColumnIdx)){
             attackBoard[curRowIdx][curColumnIdx] += changedValue;
             curRowIdx++; curColumnIdx++;
