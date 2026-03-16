@@ -2,39 +2,40 @@ package SORT;
 
 /**
  * @Author: Bingyu Chen
- * @CreateTime: 2025-04-12
+ * @CreateTime: 2026-03-14
  * @Description: 直接插入排序
  * 空间复杂度：O(1) -- 仅需要有限个变量
  * 时间复杂度：O(n^2) -- 两层for循环嵌套
  * 稳定性：稳定 -- 重复元素可以不交换位置
  */
-public class InsertSort {
+public class InsertSort extends abstractSort {
 
-    public static void sort(int[] arr){
-        // 从第二个元素开始，进行排序
-        for (int i = 1; i < arr.length; i++) {
-            insertX(arr,i);
+    @Override
+    int[] sortArray(int[] nums) {
+
+        for (int curIdx = 1; curIdx < nums.length; curIdx++) {
+            // [0，beginIdx-1]
+            insert2ApproprateIdx(nums, curIdx);
         }
+        return nums;
     }
 
-    /**
-     * 单层插入，
-     * @param arr 当前数组
-     * @param curIdx 当前需要插入元素的位置
-     */
-    public static void insertX(int[] arr, int curIdx){
-        int tempCurValue = arr[curIdx];
-        for (int i = curIdx - 1; i >= 0; i--) {
-            // 从后往前交换顺序
-            if (arr[i] > arr[i+1]){
-                arr[i+1] = arr[i];
-                arr[i] = tempCurValue;
-            }else{
-                //说明 arr[i]<= arr[curIdx]
-                // 说明当前排序结束，返回
-                return;
+    private void insert2ApproprateIdx(int[] nums, int curIdx) {
+        // 将 curIdx 插入到当前有序数组的合适位置
+        // 即倒序交换比curIdx数值大的
+        for (int beforeIdx = curIdx -1; beforeIdx >= 0; beforeIdx--) {
+            if (nums[beforeIdx] > nums[curIdx]){
+                exchangeVals(nums,beforeIdx, curIdx);
+                curIdx = beforeIdx;
+            }else {
+                break;
             }
         }
     }
 
+    private void exchangeVals(int[] nums, int beforeIdx, int curIdx) {
+        int biggerTemp = nums[beforeIdx];
+        nums[beforeIdx] = nums[curIdx];
+        nums[curIdx] = biggerTemp;
+    }
 }

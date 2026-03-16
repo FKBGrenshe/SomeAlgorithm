@@ -1,13 +1,93 @@
 package SORT;
 
+
 import java.util.Arrays;
+
+public class MergeSort extends abstractSort{
+    int[] nums;
+
+    @Override
+    int[] sortArray(int[] nums) {
+        this.nums = nums;
+        int beginIdx = 0;
+        int endIdx = nums.length-1;
+        doSort(beginIdx, endIdx);
+        return nums;
+    }
+
+    private void doSort(int beginIdx, int endIdx) {
+        if (beginIdx == endIdx) return;
+        // 中间idx
+        int midIdx = (beginIdx + endIdx)/2;
+        // 左子数组排序
+        doSort(beginIdx,midIdx);
+        // 右子数组排序
+        doSort(midIdx+1, endIdx);
+        // 排序所有数组
+        basicSort(beginIdx, midIdx,endIdx);
+    }
+
+    private void basicSort(int beginIdx, int midIdx, int endIdx) {
+        int[] tempArr = new int[endIdx-beginIdx+1];
+        int curLeftIdx = beginIdx;
+        int curRightIdx = midIdx+1;
+        int curTempIdx = 0;
+
+        while (curLeftIdx <= midIdx && curRightIdx<= endIdx){
+            if (nums[curLeftIdx] <= nums[curRightIdx]){
+                // 将左子数组的当前元素放入tempArr
+                tempArr[curTempIdx++] = nums[curLeftIdx++];
+            }else {
+                // 将右子树组的当前元素放入tempArr
+                tempArr[curTempIdx++] = nums[curRightIdx++];
+            }
+        }
+        // todo  将剩余元素挨个添加进入tempArr
+        if (curRightIdx <= endIdx){
+            // 左子数组已经拷贝完了，还差右子数组
+            while (curRightIdx <= endIdx){
+                tempArr[curTempIdx++] = nums[curRightIdx++];
+            }
+        }
+        // 还差左子数组，右子数组已经拷贝完了
+        while (curLeftIdx <= midIdx){
+            tempArr[curTempIdx++] = nums[curLeftIdx++];
+        }
+
+        // 拷贝回原数组
+        curTempIdx = 0;
+        for (int i = beginIdx; i <= endIdx; i++) {
+            nums[i] = tempArr[curTempIdx++];
+        }
+    }
+
+    public static void main(String[] args) {
+        MergeSort mergeSort = new MergeSort();
+        int[] sortedArray = mergeSort.sortArray(
+                new int[]{
+                        5, 6, 8, 2, 1, 4, 9, 7, 3
+                }
+        );
+
+        System.out.println(Arrays.toString(sortedArray));
+
+    }
+
+}
+
+
+
+
+
+
+
 
 /**
  * @Author: Bingyu Chen
  * @CreateTime: 2025-04-15
  * @Description: 归并排序
  */
-public class MergeSort {
+/*public class MergeSort {
     // 原数组
     int[] nums;
     // 辅助数组
@@ -79,4 +159,4 @@ public class MergeSort {
         }
     }
 
-}
+}*/
