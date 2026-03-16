@@ -65,6 +65,24 @@ public class test {
         int[] quickSortedArr = quickSort.sortArray(quickSortArr);
         System.out.println(checkIfSorted(quickSortedArr));
 
+        // 归并排序
+        int[] mergeSortArr = Arrays.copyOf(randomArr, randomArr.length);
+        MergeSort mergeSort = new MergeSort();
+        int[] mergeSortedArray = mergeSort.sortArray(mergeSortArr);
+        System.out.println(checkIfSorted(mergeSortedArray));
+
+        // 计数排序
+        int[] radixSortArr = Arrays.copyOf(randomArr, randomArr.length);
+        RadixSort radixSort = new RadixSort();
+        int[] radixSortedArray = radixSort.sortArray(radixSortArr);
+        System.out.println(checkIfSorted(radixSortedArray));
+
+        // 桶排序
+
+        // 基数排序
+
+        // 堆排序
+
     }
 
     // 随机产生无序数组
