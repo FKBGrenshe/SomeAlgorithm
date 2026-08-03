@@ -51,9 +51,9 @@ class RandomizedSet {
 
     public int getRandom() {
         Random random = new Random();
-        int idx = random.nextInt(0, org.size());
+        int idx = random.nextInt();
         while (!valueMap.containsKey(org.get(idx))){
-            idx = random.nextInt(0, org.size());
+            idx = random.nextInt();
         }
         return org.get(idx);
     }

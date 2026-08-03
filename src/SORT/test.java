@@ -94,7 +94,7 @@ public class test {
         int[] org = new int[n];
 
         for (int i = 0; i < org.length; i++) {
-            int idx = random.nextInt(0,10);
+            int idx = random.nextInt();
             org[i] = idx;
         }
         return org;

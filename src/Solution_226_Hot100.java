@@ -1,4 +1,3 @@
-import com.sun.source.tree.Tree;
 
 public class Solution_226_Hot100 {
     public TreeNode invertTree(TreeNode root){

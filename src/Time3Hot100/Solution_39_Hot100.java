@@ -24,7 +24,7 @@ public class Solution_39_Hot100 {
         }
 
 
-        int prevNumber = curpath.isEmpty() ? candidates[0] : curpath.getLast();
+        int prevNumber = curpath.isEmpty() ? candidates[0] : curpath.get(curpath.size()-1);
         int startIdx = 0;
         while (candidates[startIdx] != prevNumber){
             startIdx++;
